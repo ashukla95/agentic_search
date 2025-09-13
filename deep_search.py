@@ -8,6 +8,9 @@ from agents import (
     Runner,
     trace
 )
+from agents.exceptions import (
+    InputGuardrailTripwireTriggered
+)
 from dotenv import load_dotenv
 from gradio import (
     Blocks,
@@ -26,6 +29,7 @@ from module.agents.clarifications import (
 )
 
 import gradio as gr
+from traceback import print_exc
 
 
 # load env variables once
@@ -39,24 +43,40 @@ load_dotenv(
 async def generate_followups(
     query: str
 ):
-    with trace("clarifications"):
-        result = await Runner.run(
-            clarification_agent,
-            query
-        )
-        print(f"result: {result}")
-        print(f"result type: {type(result)}")
-        result = result.final_output
+    try:
+        with trace("clarifications"):
+            result = await Runner.run(
+                clarification_agent,
+                query
+            )
+            print(f"result: {result}")
+            print(f"result type: {type(result)}")
+            result = result.final_output
+            yield [
+                query,
+                gr.update(visible=True, interactive=True),
+                gr.update(visible=True, interactive=True),
+                gr.update(visible=True, interactive=True),
+                gr.update(visible=True, value=f"{result.questions[0]}"),
+                gr.update(visible=True, value=f"{result.questions[1]}"),
+                gr.update(visible=True, value=f"{result.questions[2]}"),
+                gr.update(visible=False),
+                gr.update(visible=False),
+            ]
+    except (InputGuardrailTripwireTriggered) as e:
+        print(f"Exception: {e}")
+        print(f"Exception traceback: {print_exc()}")
         yield [
-            query,
-            gr.update(visible=True, interactive=True),
-            gr.update(visible=True, interactive=True),
-            gr.update(visible=True, interactive=True),
-            gr.update(visible=True, value=f"{result.questions[0]}"),
-            gr.update(visible=True, value=f"{result.questions[1]}"),
-            gr.update(visible=True, value=f"{result.questions[2]}"),
-            gr.update(visible=False)
-        ]
+                query,
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=False),
+                gr.update(visible=True),
+                gr.update(visible=True, value=f"Input is not acceptable: {e}."),
+            ]
 
 
 async def run(
@@ -115,7 +135,7 @@ with Blocks(
             main_query, 
             answer_1, answer_2, answer_3, 
             question_1, question_2, question_3, 
-            followup_button
+            followup_button, report
         ]
     )
     run_button.click(
