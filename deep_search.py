@@ -14,7 +14,8 @@ from gradio import (
     Button,
     Markdown,
     Textbox,
-    Column
+    Column,
+    Row
 )
 from gradio.themes import (
     Default
@@ -48,17 +49,25 @@ async def generate_followups(
         result = result.final_output
         yield [
             query,
-            gr.update(visible=True, label=f"{result.questions[0]}"),
-            gr.update(visible=True, label=f"{result.questions[1]}"),
-            gr.update(visible=True, label=f"{result.questions[2]}"),
+            gr.update(visible=True, interactive=True),
+            gr.update(visible=True, interactive=True),
+            gr.update(visible=True, interactive=True),
+            gr.update(visible=True, value=f"{result.questions[0]}"),
+            gr.update(visible=True, value=f"{result.questions[1]}"),
+            gr.update(visible=True, value=f"{result.questions[2]}"),
             gr.update(visible=False)
         ]
 
 
 async def run(
-    query: str, answer_1: str, answer_2: str, answer_3: str
+    query: str, 
+    question_1: str, answer_1: str, 
+    question_2: str, answer_2: str, 
+    question_3: str, answer_3: str
 ):
-    print(f"Final details: {query}, {answer_1}, {answer_2}, {answer_3}")
+    print(
+        f"Final details: {query}, {question_1}, {answer_1}, {question_2}, {answer_2}, {question_3}, {answer_3}"
+    )
     yield "complete"
 
 
@@ -74,9 +83,18 @@ with Blocks(
         label = "Give me a topic to search"
     )
     with Column():
-        answer_1 = Textbox(label="Answer_1", visible=False)
-        answer_2 = Textbox(label="Answer_2", visible=False)
-        answer_3 = Textbox(label="Answer_3", visible=False)
+        with Row():
+            # question_1 = Textbox(label="Q_1", visible=False)
+            question_1 = Markdown(value="Q_1", visible=False)
+            answer_1 = Textbox(label="Answer", visible=False)
+        with Row():
+            question_2 = Markdown(value="Q_2", visible=False)
+            # question_2 = Textbox(label="Q_2", visible=False)
+            answer_2 = Textbox(label="Answer", visible=False)
+        with Row():
+            question_3 = Markdown(value="Q_3", visible=False)
+            # question_3 = Textbox(label="Q_3", visible=False)
+            answer_3 = Textbox(label="Answer", visible=False)
     followup_button = Button(
         "Generate Followup queries.",
         variant="primary"
@@ -93,11 +111,21 @@ with Blocks(
     followup_button.click(
         fn=generate_followups,
         inputs=[main_query],
-        outputs=[main_query, answer_1, answer_2, answer_3, followup_button]
+        outputs=[
+            main_query, 
+            answer_1, answer_2, answer_3, 
+            question_1, question_2, question_3, 
+            followup_button
+        ]
     )
     run_button.click(
         fn=run, 
-        inputs=[main_query, answer_1, answer_2, answer_3],
+        inputs=[
+            main_query, 
+            question_1, answer_1, 
+            question_2, answer_2, 
+            question_3, answer_3
+        ],
         outputs=[report]
     )
 
