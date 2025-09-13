@@ -1,0 +1,43 @@
+from agents import (
+    Agent,
+    WebSearchTool,
+    ModelSettings
+)
+
+from module.constants import (
+    DEFAULT_LLM
+)
+
+
+WEB_SEARCH_AGENT_INSTRUCTIONS = """
+YOU ARE AN AGENT WHO WILL BE PERFORMING WEB SEARCH 
+FOR THE DETAIL THAT IS PASSED TO YOU.
+ENSURE THAT RELEVANT AND CONCISE DETAILS ARE SENT BACK
+AS AN OUTPUT TO THE SEARCH RESULT YOU OBTAIN AND THEN 
+PROVIDE. 
+THE OUTPUT SHOULD NOT BE OF MARKDOWN TYPE AND RATHER 
+TEXT OUTPUT IS PREFERRED.
+DO NOT ADD ANY ADDITIONAL DETAIL FROM YOUR SIDE, 
+ONLY FORMAT AND RETURN BACK WHATEVER YOU OBTAIN
+FROM YOUR WEB SEARCH. 
+CITE SOURCES OF YOUR WEB SEARCH TO HELP PROVIDE
+REFERENCES.
+LASTLY, NOT MORE THAN 2 PARAGRAPHS OF MAX 400 WORDS EACH 
+ARE DESIRED.
+"""
+
+
+web_search_agent = Agent(
+    name="web search agent",
+    instructions=WEB_SEARCH_AGENT_INSTRUCTIONS,
+    tools=[
+        WebSearchTool(
+            search_context_size="low"
+        )
+    ],
+    model=DEFAULT_LLM,
+    model_settings=ModelSettings(
+        tool_choice="required"
+    )
+)
+

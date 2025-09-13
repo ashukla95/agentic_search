@@ -27,6 +27,9 @@ from gradio.themes import (
 from module.agents.clarifications import (
     clarification_agent
 )
+from module.agents.research import (
+    research_agent
+)
 
 import gradio as gr
 from traceback import print_exc
@@ -88,7 +91,23 @@ async def run(
     print(
         f"Final details: {query}, {question_1}, {answer_1}, {question_2}, {answer_2}, {question_3}, {answer_3}"
     )
-    yield gr.update(visible=True, value=f"Complete.")
+    research_topic_details = f"""
+        {query}
+        Additional details: 
+        {question_1}: {answer_1}
+        {question_2}: {answer_2}
+        {question_3}: {answer_3}
+    """
+    with trace("research"):
+        result = await Runner.run(
+            research_agent,
+            research_topic_details
+        )
+        result = result.final_output
+    yield gr.update(
+        visible=True, 
+        value=f"Research Complete. Details: {result}"
+    )
 
 
 with Blocks(
