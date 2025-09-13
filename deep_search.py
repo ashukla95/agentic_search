@@ -88,7 +88,7 @@ async def run(
     print(
         f"Final details: {query}, {question_1}, {answer_1}, {question_2}, {answer_2}, {question_3}, {answer_3}"
     )
-    gr.update(visible=True, value=f"Complete.")
+    yield gr.update(visible=True, value=f"Complete.")
 
 
 with Blocks(
