@@ -15,12 +15,13 @@ I could have deployed it to huggingface but fear misuse and hence is restricted 
 Feel free to use it and cite if it helps even for a bit.
 To run it:
 1) Make sure python is installed on the system
-2) Create a venv
-3) Activate the venv
-4) Clone the repo.
-5) Once inside the repo locally, run pip3 install -r requirements.txt . If using other package manager run required commands.
-6) Since I am using uv, the final command to run the app is: uv run deep_research_runner.py
+2) Ensure that you have a .env file with OPENAI_API_KEY="..." added post cloning the repo.
+3) Create a venv
+4) Activate the venv
+5) Clone the repo.
+6) Once inside the repo locally, run pip3 install -r requirements.txt . If using other package manager run required commands.
+7) Since I am using uv, the final command to run the app is: uv run deep_research_runner.py
 
-
+Note: BEWARE! this repo used websearchtool from openai and it costs some money than a regular chat interface so if you run, kindly kindly ensure that you have the smallest credit loaded with auto-recharge on openai billing turned off.
 One thing to call out is the fact that I would say after developing this that 
 non-sentient orchestration is necessary to control the side-effects of using agents.
