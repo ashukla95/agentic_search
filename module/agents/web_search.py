@@ -3,9 +3,14 @@ from agents import (
     WebSearchTool,
     ModelSettings
 )
+from pydantic import (
+    BaseModel,
+    Field
+)
 
 from module.constants import (
-    DEFAULT_LLM
+    DEFAULT_LLM,
+    DEFAULT_WEB_SEARCH_PLAN_TOPICS
 )
 
 
@@ -22,15 +27,67 @@ ONLY FORMAT AND RETURN BACK WHATEVER YOU OBTAIN
 FROM YOUR WEB SEARCH. 
 CITE SOURCES OF YOUR WEB SEARCH TO HELP PROVIDE
 REFERENCES.
+KINDLY USE THE WEB SEARCH PLANNER TOOL 
+(web_search_plan_list_generator) TO GENERATE A LIST
+OF DETAILS TO BE SEARCHED. dO nOT, I REPEAT, dO nOT SKIP
+THIS TOOL OR COME UP WITH YOUR OWN SEARCH LIST.
+YOU HAVE SEARCHES TO DO LET THE CLERICAL WORK FOR YOU
+BE HANDLED BY THE AGENT ASSIGNED.
+PASS IN THE INSTRUCTIONS YOU RECEIVE AS IS THE PLANNER
+AGENT AND LET IT COME UP WITH THE DETAILS YOU NEED
+FOR THE SEARCH.
 LASTLY, NOT MORE THAN 2 PARAGRAPHS OF MAX 400 WORDS EACH 
 ARE DESIRED.
 """
 
 
+WEB_SEARCH_PLANNER_INSTRUCTIONS = f"""
+YOU ARE AN AGENT THAT IS TASKED TO COME UP WITH A LIST
+OF WEB SEARCHES THAT CAN BE PERFORMED FOR A TASK AT HAND.
+YOU WILL GET THE EXACT SAME DETAIL AS THE AGENT WHO WILL
+BE CO-ORDINATING THE SEARCHES WITH YOU.
+YOUR OUTPUT SHOULD NOT BE A MARKDOWN.
+YOU SHOULD COME UP WITH A LIST OF CONCISE SEARCH DETAILS
+AND ENSURE NO ADDITIONAL METADATA IS ADDED.
+AN EXAMPLE CAN BE, IF SOMEONE ASKS ABOUT MOUNT KAILASH,
+YOUR OUTPUT SEARCHES CAN BE:
+* REGION WHERE IT IS SITUATED
+* HISTORICAL SIGNIFICANCE
+* PROPERTIES
+* GOVT REGULATIONS
+* SPIRITUAL SIGNIFICANCE
+.
+.
+AND THIS CAN CONTINUE ON AND ON. 
+GENERATE THE LIST WITH 
+{DEFAULT_WEB_SEARCH_PLAN_TOPICS} WEB SEARCHES ONLY.
+"""
+
+
+class WebSearchItemList(BaseModel):
+    search_term: list[str] = Field(
+        "List of searches to be made."
+    )
+
+
+# TODO: should we have an evaluator here?
+web_search_planner_agent = Agent(
+    name="web search planner",
+    instructions=WEB_SEARCH_PLANNER_INSTRUCTIONS,
+    model=DEFAULT_LLM,
+    output_type=WebSearchItemList
+)
+
+
+# TODO: SHOULD WE ADD A FORMATTER HERE? - I DON'T THINK SO.
 web_search_agent = Agent(
     name="web search agent",
     instructions=WEB_SEARCH_AGENT_INSTRUCTIONS,
     tools=[
+        web_search_planner_agent.as_tool(
+            tool_name="web_search_plan_list_generator",
+            tool_description="an agent to generate a list of queries to be searched on the web for details"
+        ),
         WebSearchTool(
             search_context_size="low"
         )
