@@ -8,6 +8,9 @@ from module.constants import (
 from module.agents.web_search import (
     web_search_agent
 )
+from module.agents.report import (
+    report_generator_agent
+)
 
 
 RESEARCH_AGENT_INSTRUCTIONS = f"""
@@ -19,8 +22,8 @@ and provide concise details about the topic to be researched.
 The return type should not be of markdown type.
 Kindly do not write anything yourself. Use tools at disposal
 to get the job done.
-Kindly ensure that redundant information is removed and thus
-a concise detail is generated.
+use report_generator agent to help get the report curated 
+and hence just work as the main orchestrator.
 """
 
 
@@ -37,6 +40,10 @@ research_agent = Agent(
         web_search_agent.as_tool(
             tool_name="web_search_agent",
             tool_description="web search agent tool"
+        ),
+        report_generator_agent.as_tool(
+            tool_name="report_generator",
+            tool_description="agent to curate final report"
         )
     ]
 )
