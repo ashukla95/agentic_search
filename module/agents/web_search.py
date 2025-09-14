@@ -27,21 +27,10 @@ ONLY FORMAT AND RETURN BACK WHATEVER YOU OBTAIN
 FROM YOUR WEB SEARCH. 
 CITE SOURCES OF YOUR WEB SEARCH TO HELP PROVIDE
 REFERENCES.
-KINDLY USE THE WEB SEARCH PLANNER TOOL 
-(web_search_plan_list_generator) TO GENERATE A LIST
-OF DETAILS TO BE SEARCHED. dO nOT, I REPEAT, dO nOT SKIP
-THIS TOOL OR COME UP WITH YOUR OWN SEARCH LIST.
-YOU HAVE SEARCHES TO DO LET THE CLERICAL WORK FOR YOU
-BE HANDLED BY THE AGENT ASSIGNED.
-PASS IN THE INSTRUCTIONS YOU RECEIVE AS IS THE PLANNER
-AGENT AND LET IT COME UP WITH THE DETAILS YOU NEED
-FOR THE SEARCH.
 MAKE SURE TO SHOW THE DETAIL AS A Q and A SO THAT THE 
 END USER USING IT WILL BE ABLE TO CLEARLY UNDERSTAND 
 WHICH PIECE OF INFORMATION IS ASSOCIATED TO WHICH 
 QUESTION.
-LASTLY, NOT MORE THAN 2 PARAGRAPHS OF MAX 400 WORDS EACH 
-ARE DESIRED.
 """
 
 
@@ -68,6 +57,18 @@ GENERATE THE LIST WITH
 """
 
 
+WEB_SEARCH_PLAN_TRIMMER_INSTRUCTIONS = f"""
+YOUR COLLEAGUE WILL GENERATE A LIST OF TOPICS TO BE
+SEARCHED. YOUR JOB IS TO DETERMINE IF THERE ARE 
+DUPLICATES, LIERALLY OR EVEN SEMANTICALLY.
+AN EXAMPLE IS, YOU RECEIVE 
+[STOCK DETAIL LAST 7 DAYS, STOCK PRICE YESTERDAY]
+NOW THE FIRST ONE ENCLOSES THE SECOND AS LAST 7 DAYS
+INCLUDES YESTERDAY. HENCE, THE OUTPUT YOU RETURN WILL
+BE [STOCK LAST 7 DAYS]. 
+"""
+
+
 class WebSearchItemList(BaseModel):
     search_term: list[str] = Field(
         "List of searches to be made."
@@ -83,15 +84,19 @@ web_search_planner_agent = Agent(
 )
 
 
+web_search_plan_trimmer_agent = Agent(
+    name="web search planner",
+    instructions=WEB_SEARCH_PLAN_TRIMMER_INSTRUCTIONS,
+    model=DEFAULT_LLM,
+    output_type=WebSearchItemList
+)
+
+
 # TODO: SHOULD WE ADD A FORMATTER HERE? - I DON'T THINK SO.
 web_search_agent = Agent(
     name="web search agent",
     instructions=WEB_SEARCH_AGENT_INSTRUCTIONS,
     tools=[
-        web_search_planner_agent.as_tool(
-            tool_name="web_search_plan_list_generator",
-            tool_description="an agent to generate a list of queries to be searched on the web for details"
-        ),
         WebSearchTool(
             search_context_size="low"
         )
