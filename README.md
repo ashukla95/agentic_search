@@ -13,4 +13,11 @@ really idempotent.
 Uses Gradio to allow interactions.
 I could have deployed it to huggingface but fear misuse and hence is restricted to repo only for now.
 Feel free to use it and cite if it helps even for a bit.
+To run it:
+1) Make sure python is installed on the system
+2) Create a venv
+3) Activate the venv
+4) Clone the repo.
+5) Once inside the repo locally, run pip3 install -r requirements.txt . If using other package manager run required commands.
+6) Since I am using uv, the final command to run the app is: uv run deep_research_runner.py
 
