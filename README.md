@@ -21,3 +21,6 @@ To run it:
 5) Once inside the repo locally, run pip3 install -r requirements.txt . If using other package manager run required commands.
 6) Since I am using uv, the final command to run the app is: uv run deep_research_runner.py
 
+
+One thing to call out is the fact that I would say after developing this that 
+non-sentient orchestration is necessary to control the side-effects of using agents.
